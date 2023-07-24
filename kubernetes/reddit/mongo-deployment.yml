@@ -1,11 +1,12 @@
-
-apiVersion: v1
+---
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: mongo
   labels:
     app: reddit
     component: mongo
+    post-db: "true"
     comment-db: "true"
 spec:
   replicas: 1
@@ -19,6 +20,7 @@ spec:
       labels:
         app: reddit
         component: mongo
+        post-db: "true"
         comment-db: "true"
     spec:
       containers:
@@ -27,6 +29,9 @@ spec:
         volumeMounts:
         - name: mongo-persistent-storage
           mountPath: /data/db
-      volumes:
+      volumes: # Ассоциированные с POD-ом Volume-ы
+      # name: mongo-gce-pd-storage
       - name: mongo-persistent-storage
-        emptyDir: {}
+        # emptyDir: {} #При создании пода с такимтипом просто создается пустой docker volume
+        persistentVolumeClaim:
+          claimName: mongo-pvc
